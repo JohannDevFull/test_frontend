@@ -1,7 +1,7 @@
 
 
 <template>
-  <UForm :validate="validate" :task="task" class="space-y-4" @submit="onSubmit">
+  <UForm :task="task" class="space-y-4" @submit="onSubmit">
 
     <UFormGroup label="Titulo" name="title">
       <UInput v-model="task.title" />
@@ -32,27 +32,29 @@
   import type { FormError, FormSubmitEvent } from '#ui/types'
   import { ref, onMounted } from 'vue'
 
+  import Swal from 'sweetalert2/dist/sweetalert2.js'
+  import 'sweetalert2/dist/sweetalert2.min.css'
+  
   const props = defineProps([ 'type_action' , 'task_data' ]);
 
   const states = [{
-    name: 'Seleccionar una opcion',
-    value: '0',
-    disabled: true
-  },
-  {
-    name: 'Sin empezar',
-    value: '1'
-  }, {
-    name: 'En proceso',
-    value: '2',
-    
-  },{
-    name: 'Terminada',
-    value: '3'
+      name: 'Seleccionar una opcion',
+      value: '0',
+      disabled: true
+    },
+    {
+      name: 'Sin empezar',
+      value: '1'
+    }, {
+      name: 'En proceso',
+      value: '2',
+      
+    },{
+      name: 'Terminada',
+      value: '3'
   }]
 
   const task = ref({
-    id:0,
     title: '',
     description: '',
     deadline: '',
@@ -63,26 +65,24 @@
   const title = ref('Tarea');
 
   onMounted(() => {
-    if ( props.type_action == 1 )
+    if ( props.type_action == 2 )
     {
       task.value = props.task_data
     }
   })
 
-  const validate = (task: any): FormError[] => {
-    const errors = []
-    if (!task.title) errors.push({ path: 'title', message: 'Required' })
-    if (!task.description) errors.push({ path: 'description', message: 'Required' })
-    if (!task.deadline) errors.push({ path: 'deadline', message: 'Required' })
-    if (!task.status) errors.push({ path: 'status', message: 'Required' })
-    return errors
-  }
+  // const validate = (task: any): FormError[] => {
+  //   const errors = []
+  //   if (!task.title) errors.push({ path: 'title', message: 'Required' })
+  //   if (!task.description) errors.push({ path: 'description', message: 'Required' })
+  //   if (!task.deadline) errors.push({ path: 'deadline', message: 'Required' })
+  //   if (!task.status) errors.push({ path: 'status', message: 'Required' })
+  //   return errors
+  // }
 
   async function onSubmit (event: FormSubmitEvent<any>) {
 
-    let type = 2;
-    
-    if (type == 1) {
+    if (  props.type_action == 1 ) {
       store(event);
     } else {
       update(event);
@@ -90,22 +90,31 @@
   }
 
   async function store (event: FormSubmitEvent<any>) {
-    const response = await $fetch('/api/taks', {
+    const response = await $fetch('http://127.0.0.1:8000/api/tasks/', {
       method: 'POST',
       headers: { "Access-Control-Allow-Origin": "*", 'Access-Control-Allow-Headers': '*', },
-      body: {
-        task:task
-      }
+      body:task.value
+    });
+
+    Swal.fire({
+      title: 'OK!',
+      text: 'Recurso creado.',
+      icon: 'success',
+      confirmButtonText: 'Bueno'
     });
   }
 
   async function update (event: FormSubmitEvent<any>) {
-    const response = await $fetch('/api/taks/'+task.id , {
+    const response = await $fetch('http://127.0.0.1:8000/api/tasks/'+props.task_data.id+'/' , {
       method: 'PUT',
       headers: { "Access-Control-Allow-Origin": "*", 'Access-Control-Allow-Headers': '*', },
-      body: {
-        task:task
-      }
+      body: task.value
+    });
+    Swal.fire({
+      title: 'OK!',
+      text: 'Recurso actualizado.',
+      icon: 'success',
+      confirmButtonText: 'Bueno'
     });
   }
 

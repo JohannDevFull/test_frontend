@@ -66,7 +66,7 @@
         
                                     <td class="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium">
                                         <UButton @click="edit( item )" color="blue" variant="solid">Editar</UButton>
-                                        <UButton @click="edit( item.id)" color="red" variant="solid">Eliminar</UButton>
+                                        <UButton @click="destroy( item.id)" color="red" variant="solid">Eliminar</UButton>
                                     </td>
                                 </tr>
                                 
@@ -107,6 +107,8 @@
 <script>
   import AppLayout from "../Layout/applayout.vue";
   import Formulario from "../Components/Formulario.vue";
+  import Swal from 'sweetalert2/dist/sweetalert2.js'
+  import 'sweetalert2/dist/sweetalert2.min.css'
 
   export default {
     data(){
@@ -128,7 +130,8 @@
     },
     components: {
       AppLayout,
-      Formulario
+      Formulario,
+      Swal
     },
     mounted(){
         this.get();
@@ -140,13 +143,16 @@
         },
         edit(element){
             this.type = 2;
-            this.task_data = element;
+            this.task_data = Object.assign( {} , element);
+            const fecha = new Date(element.deadline);
+            const fechaFormateada = fecha.toISOString().slice(0, 16);
+            this.task_data.deadline = fechaFormateada;
+            this.isOpen = true;
         },
-        async delete( id ) {
-            const response = await $fetch('/api/taks/'+id , {
+        async destroy( id ) {
+            const response = await $fetch('http://127.0.0.1:8000/api/tasks/'+id+'/' , {
                 method: 'DELETE',
                 headers: { "Access-Control-Allow-Origin": "*", 'Access-Control-Allow-Headers': '*', },
-                
             });
         },
         async get() {
