@@ -18,7 +18,9 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@fortawesome/vue-fontawesome": "^3.0.5",
     "@nuxt/ui": "^2.11.1",
+    "axios": "^1.6.2",
     "sweetalert2": "^11.10.1"
   }
 }

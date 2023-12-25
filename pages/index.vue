@@ -13,35 +13,52 @@
       </div>
 
       <form class="mt-4" @submit.prevent="login()">
-          <label class="block">
-              <span class="text-gray-700 text-sm">Email</span>
-              <input v-model="element.user" type="email" class="form-input mt-1 block w-full text-black rounded-md focus:border-indigo-600" >
-          </label>
 
-          <label class="block mt-3">
-              <span class="text-gray-700 text-sm">Password</span>
-              <input v-model="element.pass" type="password" class="form-input mt-1 block w-full text-black rounded-md focus:border-indigo-600">
-          </label>
+        <label class="block">
+          <span class="text-gray-700 text-sm">Email</span>
+          <input v-model="element.user" type="email" id="email" class="form-input mt-1 block w-full text-black rounded-md focus:border-indigo-600" >
+        </label>
 
-          <div class="flex justify-between items-center mt-4">
-              <div>
-                  <label class="inline-flex items-center">
-                      <input type="checkbox" class="form-checkbox text-indigo-600">
-                      <span class="mx-2 text-gray-600 text-sm">Remember me</span>
-                  </label>
-              </div>
-              
-              <div>
-                  <a class="block text-sm fontme text-indigo-700 hover:underline" href="#">Forgot your password?</a>
-              </div>
+        <label class="block mt-3">
+            <span class="text-gray-700 text-sm">Password</span>
+            <input v-model="element.pass" type="password" class="form-input mt-1 block w-full text-black rounded-md focus:border-indigo-600">
+            <div class="text-red-600 text-sm" v-if="errors.password">
+              {{errors.password[0]}}
+            </div>
+        </label>
+
+        <div class="flex justify-between items-center mt-4">
+            <div>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" class="form-checkbox text-indigo-600">
+                    <span class="mx-2 text-gray-600 text-sm">Remember me</span>
+                </label>
+            </div>
+            
+            <div>
+                <a class="block text-sm fontme text-indigo-700 hover:underline" href="#">Forgot your password?</a>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <button class="py-2 px-4 text-center bg-indigo-600 rounded-md w-full text-white text-sm hover:bg-indigo-500">
+                Ingresar
+            </button>
+        </div>
+
+        <div class="mt-6">
+          <div>
+            <a class="block text-sm fontme text-indigo-700 hover:underline" href="/register">
+              Registrar una nueva membresía
+            </a>
           </div>
+        </div>
 
-          <div class="mt-6">
-              <button class="py-2 px-4 text-center bg-indigo-600 rounded-md w-full text-white text-sm hover:bg-indigo-500">
-                  Ingresar
-              </button>
-          </div>
       </form>
+
+      <pre>
+        {{ test }}
+      </pre>
 
     </div>
   </div>
@@ -50,36 +67,100 @@
   
   
 <script >
-export default {
-  data() {
-    return {
-      element: {
-        user: '',
-        pass: ''
+
+  import axios from 'axios';
+
+  import Swal from 'sweetalert2/dist/sweetalert2.js'
+  import 'sweetalert2/dist/sweetalert2.min.css'
+
+  export default {
+    components:{
+      Swal,
+      axios
+    },
+    data() {
+      return {
+        element: {
+          user: '',
+          pass: ''
+        },
+
+        loading:false,
+        errors:[],
+
+        test:[]
+      };
+    },
+    mounted(){
+      const token = useCookie('token');
+      if (token.value)
+      {
+        this.validateToken(token.value.token);
+        
+        // this.$router.push('/dashboard');
       }
-    };
-  },
-  methods: {
-    async login() {
+    },
+    methods: {
+      
+      async login() {
 
-      const response = await $fetch('/api/auth', {
-        method: 'POST',
-        body: {
-          auth:this.element
+        const { data , error , pending , status } = await useFetch('http://localhost:8000/api/token/', {
+          method: 'POST',
+          body: {
+            email:this.element.user,
+            password:this.element.pass
+          }
+        });
+        
+        if ( status.value == 'error')
+        {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#">Why do I have this issue?</a>'
+          });
+          this.errors = error.value.data
         }
-      });
+        if ( status.value == 'success')
+        {
 
-      // setCookie( this , 'token' , JSON.stringify(response) , {
-      //   path: '/', // Path de la cookie
-      //   maxAge: 60 * 60 * 24 * 7, // Duración de la cookie (7 días en este ejemplo)
-      //   sameSite: 'lax', // Opciones de SameSite
-      // });
+          Swal.fire({
+            icon: "success",
+            title: "Ok",
+            text: "Iniciado sesión...",
+          });
 
-      // console.log( 'test:::' , response );
+          const cookie = useCookie('token', {
+            default: () => ( {
+              token:data.value.access
+            } ),
+            watch: false
+          });
 
-      this.$router.push('/dashboard');
+          this.$router.push('/dashboard');
 
+        }
+
+      },
+      pageRegister(){
+        this.$router.push('/register');
+      },
+      async validateToken(token){
+
+        const { data , error , status } = await useFetch('http://localhost:8000/api/token/verify/', {
+          method: 'POST',
+          body: {
+            token:token
+          }
+        });
+        
+        // console.log( 'TOKEN<data>:::' , data.value );
+        // console.log( 'TOKEN<error>:::' , error.value );
+        // console.log( 'TOKEN<status>:::' , status.value );
+
+        return 'data';
+      }
     }
-  }
-};
+  };
 </script>

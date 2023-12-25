@@ -36,6 +36,7 @@
   import 'sweetalert2/dist/sweetalert2.min.css'
   
   const props = defineProps([ 'type_action' , 'task_data' ]);
+  const emit = defineEmits(['update:data', 'close']);
 
   const states = [{
       name: 'Seleccionar una opcion',
@@ -52,7 +53,8 @@
     },{
       name: 'Terminada',
       value: '3'
-  }]
+  }];
+
 
   const task = ref({
     title: '',
@@ -96,6 +98,8 @@
       body:task.value
     });
 
+    emit('update:data');
+
     Swal.fire({
       title: 'OK!',
       text: 'Recurso creado.',
@@ -116,6 +120,7 @@
       icon: 'success',
       confirmButtonText: 'Bueno'
     });
+    emit('update:data')
   }
 
 </script>

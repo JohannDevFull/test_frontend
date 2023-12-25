@@ -10,25 +10,6 @@
           </svg>
       </button>
 
-      <div class="relative mx-4 lg:mx-0">
-          <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-              <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none">
-                  <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-          </span>
-
-          <input class="w-32 pl-10 pr-4 rounded-md form-input sm:w-64 focus:border-indigo-600" type="text" placeholder="Search">
-      </div>
-
-
-
-      <NuxtLink to="/TaskForm">
-        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-        </svg>
-        <span class="mx-3">Dashboard</span>
-      </NuxtLink>
     </div>
     
     <div class="flex items-center">
